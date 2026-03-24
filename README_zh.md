@@ -1018,6 +1018,49 @@ python examples/text_format_test.py --check-reportlab --file dummy
 
 ---
 
+## 🌐 LightRAG 兼容 API 服务
+
+RAG-Anything 内置可选的 FastAPI HTTP 服务，提供与 LightRAG 兼容的文档摄入与查询接口。
+
+### 安装
+
+```bash
+pip install "raganything[api]"
+```
+
+### 启动
+
+```bash
+raganything-api
+```
+
+| 环境变量 | 默认值 | 说明 |
+| --- | --- | --- |
+| `RAGANYTHING_HOST` | `0.0.0.0` | 绑定地址 |
+| `RAGANYTHING_PORT` | `9621` | 监听端口 |
+| `RAGANYTHING_WORKING_DIR` | `./rag_storage` | 存储工作目录 |
+| `RAGANYTHING_LOG_LEVEL` | `info` | 日志级别 |
+
+交互式文档：`http://localhost:9621/docs`
+
+### 支持的路由
+
+| 路由 | 方法 | 说明 |
+| --- | --- | --- |
+| `/query` | POST | JSON 查询响应 |
+| `/query/stream` | POST | NDJSON 流式查询 |
+| `/query/data` | POST | 结构化数据检索 |
+| `/documents/upload` | POST | 多部分文档上传 |
+| `/documents/text` | POST | 单条文本插入 |
+| `/documents/texts` | POST | 批量文本插入 |
+| `/documents` | GET | 分页文档列表 |
+| `/documents/status_counts` | GET | 状态聚合统计 |
+| `/documents/pipeline_status` | GET | 管道进度状态 |
+
+详见 [`docs/lightrag_openapi.md`](docs/lightrag_openapi.md) 完整兼容矩阵及 `examples/lightrag_openapi_server.py` 启动示例。
+
+---
+
 ## 🔧 配置
 
 *系统优化参数*

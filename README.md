@@ -1035,6 +1035,49 @@ python examples/text_format_test.py --check-reportlab --file dummy
 
 ---
 
+## 🌐 LightRAG-Compatible API Server
+
+RAG-Anything ships an optional FastAPI-based HTTP server with LightRAG-compatible routes for document ingestion and querying.
+
+### Install
+
+```bash
+pip install "raganything[api]"
+```
+
+### Start
+
+```bash
+raganything-api
+```
+
+| Env var | Default | Description |
+| --- | --- | --- |
+| `RAGANYTHING_HOST` | `0.0.0.0` | Bind host |
+| `RAGANYTHING_PORT` | `9621` | Listen port |
+| `RAGANYTHING_WORKING_DIR` | `./rag_storage` | Storage working directory |
+| `RAGANYTHING_LOG_LEVEL` | `info` | Log level |
+
+Interactive docs: `http://localhost:9621/docs`
+
+### Supported Routes
+
+| Route | Method | Description |
+| --- | --- | --- |
+| `/query` | POST | JSON query response |
+| `/query/stream` | POST | NDJSON streaming query |
+| `/query/data` | POST | Structured data retrieval |
+| `/documents/upload` | POST | Multipart document upload |
+| `/documents/text` | POST | Single text insert |
+| `/documents/texts` | POST | Batch text insert |
+| `/documents` | GET | Paginated document list |
+| `/documents/status_counts` | GET | Aggregate status counts |
+| `/documents/pipeline_status` | GET | Pipeline progress |
+
+See [`docs/lightrag_openapi.md`](docs/lightrag_openapi.md) for the full compatibility matrix and `examples/lightrag_openapi_server.py` for a wired startup example.
+
+---
+
 ## 🔧 Configuration
 
 *System Optimization Parameters*
