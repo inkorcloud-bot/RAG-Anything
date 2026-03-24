@@ -3,7 +3,7 @@ import json
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 
-from ..dependencies import get_rag
+from ..dependencies import get_lightrag
 from ..models import QueryRequest
 
 router = APIRouter()
@@ -32,8 +32,8 @@ def _enrich_references(result: dict, include_chunk_content: bool) -> list[dict]:
 
 
 @router.post("/query")
-async def query_text(request: QueryRequest, rag=Depends(get_rag)):
-    result = await rag.lightrag.aquery_llm(
+async def query_text(request: QueryRequest, lightrag=Depends(get_lightrag)):
+    result = await lightrag.aquery_llm(
         request.query,
         param=request.to_query_params(False),
     )
@@ -45,8 +45,8 @@ async def query_text(request: QueryRequest, rag=Depends(get_rag)):
 
 
 @router.post("/query/stream")
-async def query_text_stream(request: QueryRequest, rag=Depends(get_rag)):
-    result = await rag.lightrag.aquery_llm(
+async def query_text_stream(request: QueryRequest, lightrag=Depends(get_lightrag)):
+    result = await lightrag.aquery_llm(
         request.query,
         param=request.to_query_params(request.stream if request.stream is not None else True),
     )
@@ -79,8 +79,8 @@ async def query_text_stream(request: QueryRequest, rag=Depends(get_rag)):
 
 
 @router.post("/query/data")
-async def query_data(request: QueryRequest, rag=Depends(get_rag)):
-    return await rag.lightrag.aquery_data(
+async def query_data(request: QueryRequest, lightrag=Depends(get_lightrag)):
+    return await lightrag.aquery_data(
         request.query,
         param=request.to_query_params(False),
     )
