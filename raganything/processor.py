@@ -1549,9 +1549,24 @@ class ProcessorMixin:
             self.logger.info(f"Starting complete document processing: {file_path}")
 
             # Step 1: Parse document
+            if callback_manager is not None:
+                callback_manager.dispatch(
+                    "on_parse_start",
+                    file_path=str(file_path),
+                    parser=self.config.parser,
+                )
+            parse_start = time.time()
             content_list, content_based_doc_id = await self.parse_document(
                 file_path, output_dir, parse_method, display_stats, **kwargs
             )
+            if callback_manager is not None:
+                callback_manager.dispatch(
+                    "on_parse_complete",
+                    file_path=str(file_path),
+                    content_blocks=len(content_list),
+                    doc_id=content_based_doc_id,
+                    duration_seconds=time.time() - parse_start,
+                )
 
             # Use provided doc_id or fall back to content-based doc_id
             if doc_id is None:
