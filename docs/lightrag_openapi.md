@@ -10,7 +10,38 @@
 pip install "raganything[api]"
 ```
 
+### Minimum startup requirements
+
+The server **cannot start** without LLM credentials.  Set these before running:
+
+```bash
+export OPENAI_API_KEY="sk-..."          # Required — server exits immediately if absent
+export OPENAI_BASE_URL="https://api.openai.com/v1"  # Optional; use for any OpenAI-compatible endpoint
+export LLM_MODEL="gpt-4o-mini"         # Optional; default: gpt-4o-mini
+export EMBEDDING_MODEL="text-embedding-3-small"     # Optional; default: text-embedding-3-small
+```
+
+For a local OpenAI-compatible server (e.g. vLLM, Ollama with OpenAI adapter, LM Studio):
+
+```bash
+export OPENAI_API_KEY="dummy"          # Any non-empty string if your server doesn't check it
+export OPENAI_BASE_URL="http://127.0.0.1:11434/v1"  # Replace with your local endpoint
+export LLM_MODEL="llama3.2"            # Replace with the model served locally
+export EMBEDDING_MODEL="nomic-embed-text"           # Replace with the embedding model served locally
+```
+
 ### Environment Variables
+
+**Model configuration (set before starting)**
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `OPENAI_API_KEY` | — | **Required.** OpenAI API key (or any non-empty string for compatible endpoints). Server exits if absent. |
+| `OPENAI_BASE_URL` | OpenAI default | Base URL for the OpenAI-compatible API. Set to a local endpoint for self-hosted models. |
+| `LLM_MODEL` | `gpt-4o-mini` | LLM model name sent to the API. |
+| `EMBEDDING_MODEL` | `text-embedding-3-small` | Embedding model name sent to the API. |
+
+**Server configuration**
 
 | Variable | Default | Description |
 | --- | --- | --- |
@@ -23,19 +54,29 @@ pip install "raganything[api]"
 ### Start
 
 ```bash
-raganything-api
+# With OpenAI
+OPENAI_API_KEY=sk-... raganything-api
+
+# With a local OpenAI-compatible server
+OPENAI_API_KEY=dummy OPENAI_BASE_URL=http://127.0.0.1:11434/v1 LLM_MODEL=llama3.2 EMBEDDING_MODEL=nomic-embed-text raganything-api
 ```
 
 Or run the example directly:
 
 ```bash
-python examples/lightrag_openapi_server.py
+OPENAI_API_KEY=sk-... python examples/lightrag_openapi_server.py
 ```
 
 Then open:
 
 - API docs: `http://localhost:9621/docs`
 - OpenAPI schema: `http://localhost:9621/openapi.json`
+
+### Startup behaviour
+
+- If `OPENAI_API_KEY` is missing → server prints an error and exits immediately (`MissingModelConfigError`).
+- If credentials are present → LightRAG is eagerly initialized during startup (before the first request). A successful start means the backend is ready to serve `/query` and `/documents/text` immediately.
+- Document-upload routes (`POST /documents/upload`) additionally require a document parser (mineru, docling, or paddleocr). If the parser is not installed, upload requests fail with a clear error; query and text-insert routes are unaffected.
 
 ---
 
