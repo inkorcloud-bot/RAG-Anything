@@ -253,21 +253,15 @@ class RAGAnything(QueryMixin, ProcessorMixin, BatchMixin):
                 self.logger.warning(f"Unknown config parameter: {key}")
 
     async def _ensure_lightrag_initialized(self):
-        """Ensure LightRAG instance is initialized, create if necessary"""
+        """Ensure LightRAG instance is initialized, create if necessary.
+
+        NOTE: Document-parser (mineru / docling / …) installation is NOT checked
+        here.  LightRAG — used for all query and text-insert operations — does not
+        require a document parser.  Parser availability is verified lazily when a
+        document-processing operation is actually attempted (see
+        ``process_document_complete_lightrag_api`` / ``verify_parser_installation_once``).
+        """
         try:
-            # Check parser installation first
-            if not self._parser_installation_checked:
-                if not self.doc_parser.check_installation():
-                    error_msg = (
-                        f"Parser '{self.config.parser}' is not properly installed. "
-                        "Please install it using 'pip install' or 'uv pip install'."
-                    )
-                    self.logger.error(error_msg)
-                    return {"success": False, "error": error_msg}
-
-                self._parser_installation_checked = True
-                self.logger.info(f"Parser '{self.config.parser}' installation verified")
-
             if self.lightrag is not None:
                 # LightRAG was pre-provided, but we need to ensure it's properly initialized
                 # Inherit model functions from LightRAG if not explicitly provided

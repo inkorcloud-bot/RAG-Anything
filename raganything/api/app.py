@@ -16,7 +16,9 @@ async def _lifespan(app: FastAPI):
     if rag is not None and hasattr(rag, "_ensure_lightrag_initialized"):
         result = await rag._ensure_lightrag_initialized()
         if result and not result.get("success", True):
-            logger.error("LightRAG initialization failed at startup: %s", result.get("error"))
+            error = result.get("error", "unknown error")
+            logger.error("LightRAG initialization failed at startup: %s", error)
+            raise RuntimeError(f"LightRAG initialization failed at startup: {error}")
     yield
 
 
